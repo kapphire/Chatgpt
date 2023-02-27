@@ -1,0 +1,104 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <title>ChatGPT - Non-commercial Q & A</title>
+  <link rel="mask-icon" href="/assets/safari-pinned-tab.svg" color="#5bbad5">
+ <meta name="msapplication-TileColor" content="#da532c">
+ <meta name="theme-color" content="#ffffff">
+</head>
+
+<body>
+    <div class="page-content page-container" id="page-content">
+        <div class="padding">
+            <div class="row container d-flex justify-content-center">
+                <div class="col-md-6">
+                    <div class="card card-bordered">
+                        <div class="card-header">
+                            <h4 class="card-title"><strong>Chat</strong></h4>
+                            <form action="" method="POST">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-xs btn-secondary" value="Clear">
+                            </form>
+                        </div>
+                        <div class="ps-container ps-theme-default ps-active-y" id="chat-content" style="overflow-y: scroll !important; height:400px !important;">
+                            {% for chat in session.chat_set.all %}
+                            <div class="media media-chat">
+                                <img class="avatar" src="https://img.icons8.com/color/36/000000/administrator-male.png" alt="...">
+                                <div class="media-body">
+                                    <p>{{ chat.question }}</p>
+                                </div>
+                            </div>
+                            <div class="media media-chat media-chat-reverse">
+                                <div class="media-body">
+                                    <p>{{ chat.answer|safe }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;">
+                            <div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                        </div>
+                        <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; right: 2px;">
+                            <div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 2px;"></div>
+                        </div>
+                    </div>
+                    <form class="publisher bt-1 border-light" method="POST" action="">
+                        {% csrf_token %}
+                        <img class="avatar avatar-xs" src="https://img.icons8.com/color/36/000000/administrator-male.png" alt="...">
+                        <input class="publisher-input" type="text" name="question" placeholder="What is your question.">
+                        <span class="publisher-btn file-group">
+                            <i class="fa fa-paperclip file-browser"></i>
+                            <input type="file">
+                        </span>
+                        <a class="publisher-btn" href="#" data-abc="true"><i class="fa fa-smile"></i></a>
+                        <a class="publisher-btn text-info" href="#" data-abc="true"><i class="fa fa-paper-plane"></i></a>
+                    </form>
+                    <button id="speak" onclick="textToSpeech()">Speak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"></script>
+    <script>
+        let player = null;
+
+        const textToSpeech = () => {
+            const sentences = '{{ chat|escapejs }}';
+            const ssml = `
+            <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="zh-CN">
+                    <voice name="zh-CN-YunxiaNeural">
+                        <prosody rate="1.10">
+                            <mstts:express-as style="newscast">
+                                ${sentences}
+                            </mstts:express-as>
+                        </prosody>
+                    </voice>
+                </speak>
+            `
+            player = new SpeechSDK.SpeakerAudioDestination();
+            const audioConfig  = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+            const speechConfig = SpeechSDK.SpeechConfig.fromSubscription("b9142fb4e8ca4fd8938d0ca4f962acd5", "eastus");
+            const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
+            synthesizer.speakSsmlAsync(
+                ssml,
+                result => {
+                    if (result.errorDetails) {
+                        console.error(result.errorDetails);
+                    } else {
+                        console.log(JSON.stringify(result));
+                    }
+                    synthesizer.close();
+                },
+                error => {
+                    console.log(error);
+                    synthesizer.close();
+            });
+        }
+    </script>
+</body>

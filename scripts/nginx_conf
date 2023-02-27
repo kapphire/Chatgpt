@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name 34.227.226.10;
+
+    root /var/www/chatgpt;
+    index index.html index.nginx-debian.html;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:8000;
+        access_log /var/log/nginx/chatgpt.com.access.log timed_combined;
+    }
+}
