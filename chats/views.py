@@ -10,7 +10,7 @@ SAMPLE_QUESTIONS = [
     '''中国历史问题'''
 ]
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 
 class HomeView(generic.FormView):
@@ -29,17 +29,19 @@ class HomeView(generic.FormView):
         Session.objects.create()
         return super().form_invalid(form)
     
-    def get_answer(self, txt, session):
-        command = ''
-        for chat in session.chat_set.all():
-            command += f'{chat.question}\n\n{chat.answer}'
-        command += f'\n\n\n\n{txt}?'
+    def get_answer(self, prompt, session):
+        context = ''
+        for chat in session.chat_set.order_by('created')[:5]:
+            # context += f'{chat.question}\n{chat.answer}\n'
+            context += f'{chat.question}\n'
+
+        print(context)
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=txt,
-            temperature=0.1,
-            max_tokens=1024,
-            top_p=1.0,
+            prompt="context:" + context + "\n\n" + "prompt:" + prompt,
+            max_tokens=4000,
+            temperature=0.7,
+            top_p=1,
             frequency_penalty=0,
             presence_penalty=0
         )

@@ -21,6 +21,7 @@ postgres=# GRANT ALL PRIVILEGES ON DATABASE chatgpt TO vmm;
 
 
 ## Deployment
+python3 -m pipenv shell
 
 ## Kill process
 - lsof -i:8000

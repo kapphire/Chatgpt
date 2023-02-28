@@ -1,13 +1,12 @@
 [Unit]
-Description=Gunicorn instance to serve chatgpt app
+Description=gunicorn daemon
 After=network.target
 
 [Service]
 User=root
 Group=www-data
-WorkingDirectory=/root/chatgpt
-Environment="PATH=/root/.local/share/virtualenvs/hackernews-XAnIAJGW/bin"
-ExecStart=/root/.local/share/virtualenvs/hackernews-XAnIAJGW/bin/gunicorn --bind 127.0.0.1:8000 -w 1 -k uvicorn.workers.UvicornWorker app.main:app
+WorkingDirectory=/home/ubuntu/Chatgpt
+ExecStart=/home/ubuntu/.local/share/virtualenvs/Chatgpt-DdWrRmJp/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/Chatgpt/chatgpt.sock chatgpt.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
