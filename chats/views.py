@@ -10,7 +10,7 @@ SAMPLE_QUESTIONS = [
     '''中国历史问题'''
 ]
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 
 class HomeView(generic.FormView):
