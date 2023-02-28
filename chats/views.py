@@ -1,4 +1,6 @@
+import os
 import openai
+from dotenv import load_dotenv
 
 from django.views import generic
 
@@ -10,8 +12,10 @@ SAMPLE_QUESTIONS = [
     '''中国历史问题'''
 ]
 
-openai.api_key = "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"
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 
+openai.api_key = API_KEY
 
 class HomeView(generic.FormView):
     template_name = 'index.html'
